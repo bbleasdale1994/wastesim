@@ -7,6 +7,10 @@ nitrification and two-stage anaerobic digestion → methane, recovered water and
 photobioreactor → oxygen and food for the crew. Crew inputs follow NASA's BVAD (Baseline Values and
 Assumptions Document).
 
+## Presentation
+
+[Closed-Loop Waste Recovery System (PDF, 13 slides)](Closed_Loop_Waste_Recovery_System.pdf): opens right in the browser.
+
 ## Run it
 
 - **Online:** open the Streamlit app link.
@@ -17,4 +21,5 @@ Assumptions Document).
 - `app.py`: interactive Streamlit app (sliders, charts, checks) with the system diagram built in.
 - `waste_sim.py`: the simulation model.
 - `params.py`: every assumption as a named parameter, with sources.
+- `Closed_Loop_Waste_Recovery_System.pdf`: the project presentation.
 - `best_design.json`: the current optimized design (10 crew, algae supplying 60 % of O₂).
