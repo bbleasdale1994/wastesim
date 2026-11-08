@@ -602,8 +602,6 @@ with t2:
         st.markdown("**Methane total so far (m³)**")
         st.line_chart(d, x="day", y="cum_ch4_m3", color=C[1])
     with b:
-        st.markdown("**O₂ store (kg)**")
-        st.line_chart(d, x="day", y="o2_store_kg", color=C[0])
         st.markdown("**CO₂ store (kg)**")
         st.line_chart(d, x="day", y="co2_store_kg", color=C[0])
     st.markdown("**Methane running total**")

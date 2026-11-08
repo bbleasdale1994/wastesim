@@ -204,8 +204,6 @@ class Params:
 
     # --- stores ---------------------------------------------------------------
     co2_store_max_kg: float = 30.0
-    o2_store_max_kg: float = 30.0
-    o2_store_init_kg: float = 15.0
     co2_store_init_kg: float = 3.0
     water_store_init_L: float = 200.0
     water_reserve_L: float = 300.0      # internal water kept for the loop; surplus goes to the crew

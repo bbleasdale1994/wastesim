@@ -113,8 +113,6 @@
     "startup_tan_g_L": 5.0,
     "drain_frac_per_day": 0.5,
     "co2_store_max_kg": 30.0,
-    "o2_store_max_kg": 30.0,
-    "o2_store_init_kg": 15.0,
     "co2_store_init_kg": 3.0,
     "water_store_init_L": 200.0,
     "water_reserve_L": 1756,

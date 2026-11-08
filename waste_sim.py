@@ -10,7 +10,7 @@ Crew -> feces line:  feed prep (dilution) -> AD1 acid stage (dual) ->        > r
                                                                           pasteurizer
                                                                                 |
      cabin CO2 + biogas CO2 -> CO2 store -> photobioreactor (LED lit) <---------/
-                                               |  O2 -> O2 store -> crew
+                                               |  O2 -> cabin air -> crew
                                                |  harvest -> edible algae -> crew food
                                                |           -> inedible + surplus -> back to AD1
                                                |  water recovered -> water store -> AD dilution
@@ -239,7 +239,6 @@ class System:
             v.c[TAN] = p.startup_tan_g_L / 1000 * v.vol
 
         # stores and accumulators
-        self.o2 = p.o2_store_init_kg
         self.co2 = p.co2_store_init_kg
         self.water = max(p.water_store_init_L, p.water_reserve_L)   # start with the reserve full
         self.food = 0.0                    # kg dry edible algae
@@ -258,7 +257,7 @@ class System:
         self.cum_ch4p = {"feces": 0.0, "algae": 0.0, "cellulose": 0.0, "pha": 0.0}
 
         self.cum = dict(ch4_m3=0.0, o2_algae=0.0, o2_demand=0.0, o2_deficit=0.0,
-                        o2_vented=0.0, co2_vented=0.0, co2_fixed=0.0, biomass=0.0,
+                        o2_surplus=0.0, co2_vented=0.0, co2_fixed=0.0, biomass=0.0,
                         food_eaten=0.0, food_to_ad=0.0, overflow=0.0, urine_overflow=0.0,
                         n_lost=0.0, sludge=0.0, base_kg=0.0, water_short=0.0,
                         energy_kWh=0.0, fert_L=0.0, fert_N=0.0, makeup_water=0.0,
@@ -847,13 +846,14 @@ class System:
             self.co2 = p.co2_store_max_kg
         o2_net = o2_alg - o2_org
         demand = crew_o2 + o2_nit
-        self.o2 += o2_net - demand
-        if self.o2 < 0:
-            self.cum["o2_deficit"] += -self.o2
-            self.o2 = 0.0
-        if self.o2 > p.o2_store_max_kg:
-            self.cum["o2_vented"] += self.o2 - p.o2_store_max_kg
-            self.o2 = p.o2_store_max_kg
+        # O2 goes straight into the cabin air as it is made (no buffer tank). Any hour the algae
+        # fall short, the ship's other O2 system makes up the difference (counted as deficit);
+        # any surplus simply raises the cabin O2 supply that hour.
+        o2_bal = o2_net - demand
+        if o2_bal < 0:
+            self.cum["o2_deficit"] += -o2_bal
+        else:
+            self.cum["o2_surplus"] += o2_bal
         self.cum["o2_algae"] += o2_net
         self.cum["o2_demand"] += demand
 
@@ -879,7 +879,7 @@ class System:
             self.rec.vol, self.pbr.vol, self.feed_buf.vol,
             X, (self.pbr.c[TAN] + self.pbr.c[UREA] + self.pbr.c[NO3]) * 1000 / max(self.pbr.vol, 1e-9),
             tds, limit, over_lit,
-            self.o2, self.co2, self.water, self.food,
+            self.co2, self.water, self.food,
             ch4, o2_net, demand, crew_co2 + biogas_co2 * p.biogas_co2_capture,
             kwh, e["led"], e["aer"], e["ad_heat"], e["past"], e["memb"], e["dryer"], e["mix"], e["comp"], e["strip"],
             e["cake"], e["pyro"], cool_total, cool_culture,
@@ -897,7 +897,7 @@ class System:
 LOG_COLS = ["day", "urine", "nit_0", "nit_1", "ad1_0", "ad1_1", "ad2_0", "ad2_1",
             "rec", "pbr", "feed_buffer",
             "algae_g_L", "pbr_N_g_L", "pbr_tds_g_L", "limit", "overlit_umol_s",
-            "o2_store_kg", "co2_store_kg", "water_store_L", "food_store_kg",
+            "co2_store_kg", "water_store_L", "food_store_kg",
             "ch4_m3_h", "o2_algae_kg_h", "o2_demand_kg_h", "co2_in_kg_h",
             "kW", "kW_led", "kW_aeration", "kW_ad_heat", "kW_pasteurize", "kW_membrane",
             "kW_dryer", "kW_mixing", "kW_compress", "kW_strip", "kW_cake_dryer", "kW_pyrolysis",
